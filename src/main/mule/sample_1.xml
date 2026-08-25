@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="2900f705-63f1-42bf-acee-18dd275ba71a" >
+		<http:listener-connection host="localhost" port="8081" />
+	</http:listener-config>
+	<flow name="sample_1Flow" doc:id="e46eb2d5-5ad1-4a5a-bd91-79d9dda835e0" >
+		<http:listener doc:name="Listener" doc:id="3b202b53-89b0-4a93-8486-9bb07e00d939" config-ref="HTTP_Listener_config" path="/sample"/>
+		<logger level="INFO" doc:name="Logger" doc:id="86097fea-e3e8-44bd-a5c5-c1b3003bddf8" message="flow started"/>
+		<http:request method="GET" doc:name="Request" doc:id="68b06e5c-cb2e-487e-97b0-85200491419c" />
+		<salesforce:query doc:name="Query" doc:id="619aadbc-4c05-47fc-b03d-71227b6fc133" />
+		<ee:transform doc:name="Transform Message" doc:id="850469fa-bbec-4c7a-9f8d-572cb9685db9" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>
