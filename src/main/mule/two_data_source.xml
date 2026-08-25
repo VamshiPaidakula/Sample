@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:os="http://www.mulesoft.org/schema/mule/os" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="587ebe27-57b7-4e51-971b-4280ad7971d9" >
+		<http:listener-connection host="localhost" port="8081" />
+	</http:listener-config>
+	<db:config name="Database_Config" doc:name="Database Config" doc:id="4e92ef34-fbd5-48bc-ba1d-bf7685d83d3a" >
+		<db:my-sql-connection host="iltdb.learn.mulesoft.com" port="3306" user="mule" password="mule" database="training" />
+	</db:config>
+	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="e5255d94-ddb7-4a0f-9341-3ae177acad2f" >
+		<http:request-connection host="training4-american-ws.cloudhub.io" port="80" />
+	</http:request-config>
+	<flow name="two_data_sourceFlow" doc:id="a1f6be90-9b08-4b7e-86a2-767432ddc494" >
+		<http:listener doc:name="Listener" doc:id="1a9f475f-fe2e-4969-9a62-a152f73fde09" config-ref="HTTP_Listener_config" path="/twodb"/>
+		<logger level="INFO" doc:name="Logger" doc:id="50c77942-6459-408f-a552-518cd8a9e970" message="flowstarted"/>
+		<http:request method="GET" doc:name="Request" doc:id="9cee3fbf-2876-4e88-a6f7-8bbd50d23d89" config-ref="HTTP_Request_configuration" path="/api/flights"/>
+		<set-variable value="#[payload]" doc:name="Set Variable" doc:id="1f1c4af2-f44e-42db-a248-92d2dee42859" variableName="flightsapi"/>
+		<db:select doc:id="0df4233f-76eb-4626-b250-60cf80d72ad8" config-ref="Database_Config">
+			<db:sql ><![CDATA[select * from accounts]]></db:sql>
+		</db:select>
+		<ee:transform doc:name="Transform Message" doc:id="f2a4b3bf-e03f-455c-a8dc-85a58e7e72d8" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+vars.flightsapi ++ payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="65010011-d00e-4b1f-90d0-0d6d8fa3224e" message="ended"/>
+	</flow>
+</mule>
